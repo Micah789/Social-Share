@@ -1,0 +1,19 @@
+.mwb-container label {
+  display: block;
+  margin-bottom: 14px;
+}
+
+.mwb-container input {
+  min-height: 32px;
+  display: block;
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.mwb-container:not(:last-child) {
+  margin-bottom: 30px;
+}
+
+.mwb-container h4 {
+  margin-bottom: 4px;
+}

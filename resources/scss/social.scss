@@ -1,0 +1,242 @@
+:root {
+  --facebook: #3b5998;
+  --twitter: #00aced;
+  --google-plus: #dd4b39;
+  --youtube: #bb0000;
+  --linkedin: #007bb6;
+  --pinterest: #cb2027;
+  --instagram: #517fa4;
+  --tumblr: #34465d;
+  --vk: #4c75a3;
+  --whatsapp: #25d366;
+  --reddit: #ff5700;
+  --skype: #00aff0;
+  --pocket: #000000;
+  --evernote: #03a82e;
+  --email: #525252;
+  --buffer: #222a30;
+  --blogger: #f4b458;
+  --wordpress: #0ba4d1;
+  --delicious: #0ba4d0;
+}
+
+.mwb-social-share {
+  display: block;
+  margin-left: 0;
+}
+
+.mwb-social-share li a.with-labels {
+  border: 0;
+  flex-direction: column;
+  margin: 0px 30px 20px;
+}
+
+.mwb-social-share li a.with-labels > svg {
+  flex: 1 0 20px;
+}
+
+.mwb-social-share li a.with-labels > span {
+  line-height: 1;
+  font-size: 0.9rem;
+}
+
+.mwb-social-share.default-social-color .mwb-twitter svg {
+  fill: var(--twitter);
+}
+
+.mwb-social-share.default-social-color .mwb-twitter {
+  border-color: var(--twitter);
+}
+
+.mwb-social-share.default-social-color .mwb-linkedin svg {
+  fill: var(--linkedin);
+}
+
+.mwb-social-share.default-social-color .mwb-linkedin {
+  border-color: var(--linkedin);
+}
+
+.mwb-social-share.default-social-color .mwb-facebook svg {
+  fill: var(--facebook);
+}
+
+.mwb-social-share.default-social-color .mwb-facebook {
+  border-color: var(--facebook);
+}
+
+.mwb-social-share.default-social-color .mwb-email svg {
+  fill: var(--email);
+}
+
+.mwb-social-share.default-social-color .mwb-email {
+  border-color: var(--email);
+}
+
+.mwb-social-share.default-social-color .mwb-google-plus svg {
+  fill: var(--google-plus);
+}
+
+.mwb-social-share.default-social-color .mwb-google-plus {
+  border-color: var(--google-plus);
+}
+
+.mwb-social-share.default-social-color .mwb-youtube svg {
+  fill: var(--youtube);
+}
+
+.mwb-social-share.default-social-color .mwb-youtube {
+  border-color: var(--youtube);
+}
+
+.mwb-social-share.default-social-color .mwb-pinterest svg {
+  fill: var(--pinterest);
+}
+
+.mwb-social-share.default-social-color .mwb-pinterest {
+  border-color: var(--pinterest);
+}
+
+.mwb-social-share.default-social-color .mwb-evernote svg {
+  fill: var(--evernote);
+}
+
+.mwb-social-share.default-social-color .mwb-evernote {
+  border-color: var(--evernote);
+}
+
+.mwb-social-share.default-social-color .mwb-skype svg {
+  fill: var(--skype);
+}
+
+.mwb-social-share.default-social-color .mwb-skype {
+  border-color: var(--skype);
+}
+
+.mwb-social-share.default-social-color .mwb-buffer svg {
+  fill: var(--buffer);
+}
+
+.mwb-social-share.default-social-color .mwb-buffer {
+  border-color: var(--buffer);
+}
+
+.mwb-social-share.default-social-color .mwb-tumblr svg {
+  fill: var(--tumblr);
+}
+
+.mwb-social-share.default-social-color .mwb-tumblr {
+  border-color: var(--tumblr);
+}
+
+.mwb-social-share.default-social-color .mwb-vk svg {
+  fill: var(--vk);
+}
+
+.mwb-social-share.default-social-color .mwb-vk {
+  border-color: var(--vk);
+}
+
+.mwb-social-share.default-social-color .mwb-pocket svg {
+  fill: var(--pocket);
+}
+
+.mwb-social-share.default-social-color .mwb-pocket {
+  border-color: var(--pocket);
+}
+
+.mwb-social-share.default-social-color .mwb-whatsapp svg {
+  fill: var(--whatsapp);
+}
+
+.mwb-social-share.default-social-color .mwb-whatsapp {
+  border-color: var(--whatsapp);
+}
+
+.mwb-social-share.default-social-color .mwb-reddit svg {
+  fill: var(--reddit);
+}
+
+.mwb-social-share.default-social-color .mwb-reddit {
+  border-color: var(--reddit);
+}
+
+.mwb-social-share.default-social-color .mwb-blogger svg {
+  fill: var(--blogger);
+}
+
+.mwb-social-share.default-social-color .mwb-blogger {
+  border-color: var(--blogger);
+}
+
+.mwb-social-share.default-social-color .mwb-wordpress svg {
+  fill: var(--wordpress);
+}
+
+.mwb-social-share.default-social-color .mwb-wordpress {
+  border-color: var(--wordpress);
+}
+
+.mwb-social-share.default-social-color .mwb-delicious svg {
+  fill: var(--delicious);
+}
+
+.mwb-social-share.default-social-color .mwb-delicious {
+  border-color: var(--delicious);
+}
+
+.mwb-social-share:not(.circle) svg,
+.mwb-social-share:not(.square) svg {
+  width: 30px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.mwb-social-share:not(.circle) svg:hover,
+.mwb-social-share:not(.square) svg:hover {
+  transform: scale(0.8);
+  -webkit-transform: scale(0.8);
+  -moz-transform: scale(0.8);
+}
+
+.mwb-social-share li {
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.mwb-social-share li:not(:last-child) {
+  margin-right: 10px;
+}
+
+.mwb-social-share.circle a,
+.mwb-social-share.square a {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  border: 2px solid;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease-in-out;
+}
+
+.mwb-social-share.circle a:hover,
+.mwb-social-share.square a:hover {
+  transform: scale(0.8);
+  -webkit-transform: scale(0.8);
+  -moz-transform: scale(0.8);
+}
+
+.mwb-social-share.circle a:hover svg,
+.mwb-social-share.square a:hover svg {
+  transform: none;
+  -webkit-transform: none;
+  -moz-transform: none;
+}
+
+.mwb-social-share.circle a svg,
+.mwb-social-share.square a svg {
+  width: 20px;
+}
+
+.mwb-social-share.circle a {
+  border-radius: 50%;
+}

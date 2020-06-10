@@ -1,18 +1,28 @@
-<?php
+<?php if (!defined('ABSPATH')) exit;
+
 /**
  * Print out social share icons and urls
  * 
  * @package MwbSocialShare
  * @version 0.2
  * @author Micah Kwaka
- * TODO: add to shortcode
- * TODO: make it into a plugin after review with dom
  */
-
-if (!defined('ABSPATH')) exit;
-
 class MwbSocialShare
 {
+  /**
+   * The single instance of the class.
+   *
+   * @var MwbSocialShare
+   * @since 0.1
+   */
+  protected static $_instance = null;
+
+  /**
+   * MwbSocialShare version.
+   *
+   * @var string
+   */
+  public $version = '0.0.1';
 
   /**
    * @var int
@@ -35,32 +45,115 @@ class MwbSocialShare
   private $thumbnail;
 
   /**
+   * Main Instance.
+   *
+   * Ensures only one instance is loaded or can be loaded.
+   *
+   * @since 0.1
+   * @static
+   * @see $pe
+   * @return MWBAFHubspotAdmin - Main instance.
+   */
+  public static function instance()
+  {
+    if (is_null(self::$_instance)) {
+      self::$_instance = new self();
+    }
+    return self::$_instance;
+  }
+
+
+  /**
+   * Cloning is forbidden.
+   *
+   * @since 0.1
+   */
+  public function __clone()
+  {
+    wc_doing_it_wrong(__FUNCTION__, __('Cloning is forbidden.', 'mwb-social-share'), '0.1');
+  }
+
+  /**
+   * Unserializing instances of this class is forbidden.
+   *
+   * @since 0.1
+   */
+  public function __wakeup()
+  {
+    wc_doing_it_wrong(__FUNCTION__, __('Unserializing instances of this class is forbidden.', 'mwb-social-share'), '0.1');
+  }
+
+
+  /**
    * Socialshare Constructor
    * @param int|null     $post_id
    * @param string|null  $post_url
    */
-  public function __construct($post_id = null, $post_url = null)
+  public function __construct($post_id = null)
   {
-    $this->id = $post_id ?? get_the_ID();
-    $this->url = $post_url ?? get_permalink();
+    $this->id = $post_id ?: get_the_ID();
+    $this->url = get_permalink($this->id);
     $this->thumbnail = wp_get_attachment_image_src(get_post_thumbnail_id($this->id), 'full')[0];
-    $this->title = htmlspecialchars(urlencode(html_entity_decode(get_the_title(), ENT_COMPAT, 'UTF-8')), ENT_COMPAT, 'UTF-8');
-    define("SOCIALSHAREPATH", get_stylesheet_directory_uri() . "/includes/social-share");
+    $this->title = htmlspecialchars(urlencode(html_entity_decode(get_the_title($this->id), ENT_COMPAT, 'UTF-8')), ENT_COMPAT, 'UTF-8');
+    
+    $this->initConstants();
+    $this->includes();
+    $this->admin = new MwbSocialShareAdmin();
+
+    add_shortcode('mwb_social_share', [$this, 'makeShortCode']);
+    add_action('acf/init', [$this, 'getOptionsPage']);
+  }
+
+  /**
+   * Define constant if not already set.
+   *
+   * @param string      $name  Constant name.
+   * @param string|bool $value Constant value.
+   */
+  private function define($name, $value)
+  {
+    if (!defined($name)) {
+      define($name, $value);
+    }
+  }
+
+  private function initConstants()
+  {
+    $this->define('MWB_SOCIAL_SHARE_PLUGIN_URL', plugin_dir_url(MWB_SOCIAL_SHARE_PLUGIN_FILE));
+    $this->define('MWB_SOCIAL_SHARE_ASSETS', MWB_SOCIAL_SHARE_PLUGIN_URL . '/assets');
+    $this->define('MWB_SOCIAL_SHARE_ASSETS_VERSION', '0.1');
+    $this->define('MWB_SOCIAL_SHARE_SVG', dirname(MWB_SOCIAL_SHARE_PLUGIN_FILE) . '/assets/svg');
   }
 
   /**
    * Get Cms options 
    * @return array  $args
    */
-  protected function getCmsOptions(): array
+  protected function getCmsOptions()
   {
-    return [
-      'social_share_selection'       => get_field('social_share_selection', 'option'),
-      'include_button_shape'         => get_field('include_button_shape', 'option'),
-      'social_share_shape'           => get_field('social_share_shape', 'option'),
-      'color_option'                 => get_field('color_option', 'option'),
-      'social_button_color'          => get_field('social_button_color', 'option')
-    ];
+    return $this->admin->getAdminOptions();
+  }
+
+  /**
+   * Call static method to add admin page
+   */
+  public function getOptionsPage()
+  {
+    try {
+      return MwbSocialShareAdmin::addOptionsPage();
+    } catch (Exception $e) {
+      $e->getMessage();
+      return false;
+    }
+  }
+
+  /**
+   * Include all our classes
+   * @return [type] [description]
+   */
+  protected function includes()
+  {
+    include_once 'inc/class-admin.php';
   }
 
   /**
@@ -69,7 +162,7 @@ class MwbSocialShare
    */
   private function setSocialMedias(): array
   {
-    $social_medias = [
+    return [
       'twitter' => [
         'url' => "https://twitter.com/intent/tweet?text={$this->title}&amp;url={$this->url}",
       ],
@@ -89,7 +182,7 @@ class MwbSocialShare
         'url' => "https://vk.com/share.php?url={$this->url}&title={$this->title}&image={$this->thumbnail}",
       ],
       'whatsapp' => [
-        'url' => "whatsapp://send?text={$this->title}-{$this->url}",
+        'url' => "whatsapp://send?text={$this->title}&{$this->url}",
         'data-attribute' => 'data-action="share/whatsapp/share"'
       ],
       'blogger' => [
@@ -109,7 +202,7 @@ class MwbSocialShare
         'data-attribute' => addslashes('title="Share by Email"'),
       ],
       'linkedin' => [
-        'url' => "http://www.linkedin.com/shareArticle?url={$this->url}&title={$this->title}",
+        'url' => "http://www.linkedin.com/shareArticle?mini=true&url={$this->url}&title={$this->title}",
       ],
       'pinterest' => [
         'url' => "https://pinterest.com/pin/create/button/?url={$this->url}&amp;media={$this->thumbnail}&amp;description={$this->title}",
@@ -117,19 +210,21 @@ class MwbSocialShare
       ],
       'buffer' => [
         'url' => "https://bufferapp.com/add?url={$this->url}&amp;text={$this->title}",
+      ],
+      'wordpress' => [
+        'url' => "https://wordpress.com/press-this.php?u={$this->url}&t={$this->title}&i={$this->thumbnail}"
+      ],
+      'delicious' => [
+        'url' => "https://delicious.com/save?v=5&noui&jump=close&url={$this->url}&title={$this->title}"
       ]
     ];
-
-    ksort($social_medias);
-
-    return $social_medias;
   }
 
   /**
    * Build array with selected Social in cms along with the url and data attribute
    * @return array  $social
    */
-  public function getSelectedSocial(): array
+  private function getSelectedSocial(): array
   {
     $socials = [];
 
@@ -153,7 +248,7 @@ class MwbSocialShare
    * Get social button shape
    * @return string $selected_socials
    */
-  public function getSocialBtnShape(): string
+  private function getSocialBtnShape(): string
   {
     $selected_socials = $this->getCmsOptions();
     if ($selected_socials['include_button_shape'] && !empty($selected_socials['social_share_shape'])) {
@@ -167,7 +262,7 @@ class MwbSocialShare
    * Get social color option
    * @return string $color
    */
-  public function getSocialColors(): string
+  private function getSocialColors(): string
   {
     $selected_socials = $this->getCmsOptions();
 
@@ -185,18 +280,25 @@ class MwbSocialShare
     return $color;
   }
 
+  /**
+   * Show label of social media
+   * @return bool|int $include_labels true_false
+   */
+  private function setSocialMediaLabel(): bool
+  {
+    $selected_socials = $this->getCmsOptions();
+    return $selected_socials['include_labels'];
+  }
 
   /**
    * Print out social share html
-   * @param string|null $title
+   * @param string|array $title
    * @return string     $html
    */
-  public function getSocialHtml(string $title = null): string
+  public function getSocialHtml($title = null): string
   {
     $classes = [];
     $styles = [];
-
-    $this->mwbSocialAssets();
 
     // gather all the configuratiions
     if (!empty($this->getSocialBtnShape()) && $this->getSocialBtnShape() !== false) {
@@ -211,17 +313,22 @@ class MwbSocialShare
       }
     }
 
+    $value = shortcode_atts(array(
+      'title' => 'Share this artcile:'
+    ), $title);
+
     // For the section title
-    if(!empty($title) && $title !== null) {
+    if (!empty($title) && $title !== null) {
+      $title = is_array($title) ? $title['title'] : $title;
       $title = sprintf('<h4>%s</h4>', $title);
     } else {
-      $title = "<h4>Share this article:</h4>";
+      $title = sprintf("<h4>%s</h4>", $value['title']);
     }
 
     // Return the html
     return sprintf(
       '%s
-      <ul class="mwb-social %s" style="%s">
+      <ul class="mwb-social-share %s" style="%s">
         %s
       </ul>',
       $title,
@@ -240,16 +347,26 @@ class MwbSocialShare
   {
     $socials = $this->getSelectedSocial();
     $social_links = [];
+    $social_labels = $this->setSocialMediaLabel();
 
     foreach ($socials as $social_key => $social) {
+      $classes = ["mwb-$social_key"];
+      if ($social_labels) {
+        $classes[] = 'with-labels';
+        $labels = sprintf('<span>%s</span>', ucfirst(preg_replace("/[\-_]/", " ", $social_key)));
+      } else {
+        $labels = null;
+      }
+
       $social_links[] = sprintf(
         '<li>
-          <a class="mwb-%s" href="%s" %s target="blank" rel="nofollow">%s</a>
+          <a class="%s" href="%s" %s target="blank" rel="nofollow">%s %s</a>
         </li>',
-        $social_key,
+        implode(" ", $classes),
         !empty($social['url']) ? $social['url'] : false,
         !empty($social['data-attribute']) ? $social['data-attribute'] : false,
-        $this->mwbSocialPartial("assets/svg/{$social_key}")
+        $this->mwbSocialPartial($social_key),
+        $labels
       );
     }
 
@@ -262,24 +379,32 @@ class MwbSocialShare
    */
   private function mwbSocialPartial(string $partial)
   {
-    $path = "includes/social-share/$partial.php";
+    $path = MWB_SOCIAL_SHARE_SVG . "/$partial.php";
 
-    if (!$template = locate_template($path, false, false)) {
-      $message = "Partial doesn't exist at path '{$path}'";
-      echo "<div class=\"grid-container\" style=\"margin: 60px auto;\"><code>{$message}</code></div>";
+    try {
+      ob_start();
+      include($path);
+    } catch (Exception $e) {
+      echo $e->getMessage();
       return;
+    } finally {
+      return ob_get_clean();
     }
-
-    ob_start();
-    include($template);
-    return ob_get_clean();
   }
 
   /**
-   * Enquene css file
+   * Whether debugging is enabled.
    */
-  private function mwbSocialAssets()
+  public function debugOn()
   {
-    wp_enqueue_style('mwv-social-share-css', SOCIALSHAREPATH . '/assets/css/style.css', [], '0.0.5');
+    return (defined('WP_DEBUG') && WP_DEBUG === true);
+  }
+
+  public function makeShortCode($title = null)
+  {
+    $this->title = htmlspecialchars(urlencode(html_entity_decode(get_the_title($this->id), ENT_COMPAT, 'UTF-8')), ENT_COMPAT, 'UTF-8');
+    $this->url = urlencode(html_entity_decode(get_permalink($this->id), ENT_COMPAT, 'UTF-8'));
+    $this->thumbnail = wp_get_attachment_image_src(get_post_thumbnail_id($this->id), 'full')[0];
+    return $this->getSocialHtml($title);
   }
 }
